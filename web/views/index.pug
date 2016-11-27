@@ -1,5 +1,24 @@
 html
   head
-    title= title
+    title Thai Smart Refer
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet")
+    link(href="css/timeTo.css" rel="stylesheet")
+    link(href="css/style.css" rel="stylesheet")
+
   body
-    h1= title
+    div(id="wrap")
+      div(class="container")
+        div(class="page-header text-center")
+          h1 Thai Smart Refer
+          h1 ศูนย์ประสานงานการส่งต่อผู้ป่วย จังหวัดเลย
+        div(class="row")
+          div(class="col-md-4 col-md-offset-1")
+            a(href="/refer" style="text-align:center;")
+              img(src="img/ambulance.png" id="ambulance" width="100%")
+              h3 ส่งต่อคนไข้
+          div(class="col-md-4 col-md-offset-1")
+            a(href="/dashboard" style="text-align:center;")
+              img(src="img/hospital.png" id="hospital" width="100%")
+              h3 ดูข้อมูลคนไข้ที่จะเข้ามา

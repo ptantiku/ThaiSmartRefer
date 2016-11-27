@@ -1,6 +1,6 @@
 html
   head
-    title Dashboard
+    title Thai Smart Refer
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     meta(name="description" content="")
@@ -34,12 +34,12 @@ html
     div(id="footer")
       div(class="container")
         div(class="row")
-          div(class="col-md-9").
           div(class="col-md-3 col-md-offset-9 text-center")
             h2(id="clock") 22:25:22
 
   script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js")
   script(src="http://lexxus.github.io/jq-timeTo/js/jquery.timeTo.min.js")
+  script(src="http://momentjs.com/downloads/moment.js")
   script(type="text/javascript" src="js/web3.js")
   script(type="text/javascript" src="js/bignumber.min.js")
   script(type="text/javascript").
@@ -52,19 +52,19 @@ html
     
     var severitys = {
       1: {
-        'class': 'label-info',
+        'class': 'label-success',
         'text': 'N',
       },
       2: {
-        'class': 'label-success',
+        'class': 'label-primary',
         'text': 'S',
       },
       3: {
-        'class': 'label-waning',
+        'class': 'label-info',
         'text': 'U',
       },
       4: {
-        'class': 'label-waning',
+        'class': 'label-warning',
         'text': 'E',
       },
       5: {
@@ -80,7 +80,8 @@ html
     var coinbase = web3.eth.coinbase;
     console.log('coinbase = ' + coinbase);
     
-    var contract_id = "0x343c0e9796Ca35158877063973BdD58Fe4AdF996";
+    //var contract_id = "0x343c0e9796Ca35158877063973BdD58Fe4AdF996";
+    var contract_id = "0x1fE5154586e63BB1512C025c065dd495e0D6E5e6";
     
     var abi = [ { "constant": false, "inputs": [ { "name": "date_time", "type": "uint256" }, { "name": "est_time", "type": "uint256" }, { "name": "name", "type": "string" }, { "name": "sex", "type": "string" }, { "name": "age", "type": "uint256" }, { "name": "personal_id", "type": "string" }, { "name": "src_id", "type": "uint256" }, { "name": "dest_id", "type": "uint256" }, { "name": "department_id", "type": "uint256" }, { "name": "symptom", "type": "string" }, { "name": "severity", "type": "uint256" } ], "name": "add", "outputs": [], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "date_time", "type": "uint256" }, { "indexed": false, "name": "est_time", "type": "uint256" }, { "indexed": false, "name": "name", "type": "string" }, { "indexed": false, "name": "sex", "type": "string" }, { "indexed": false, "name": "age", "type": "uint256" }, { "indexed": false, "name": "personal_id", "type": "string" }, { "indexed": false, "name": "src_id", "type": "uint256" }, { "indexed": false, "name": "dest_id", "type": "uint256" }, { "indexed": false, "name": "department_id", "type": "uint256" }, { "indexed": false, "name": "symptom", "type": "string" }, { "indexed": false, "name": "severity", "type": "uint256" } ], "name": "alert", "type": "event" } ];
     
@@ -95,14 +96,14 @@ html
     // watch for changes
     event.watch(function(error, result){
         if (!error) {
-          console.log(result);
+          //console.log(result);
     
           var args = result.args;
     
           convertData(args);
     
           //var x = new BigNumber(args.age);
-          console.log(b2n(args.age));
+          //console.log(b2n(args.age));
 
           console.log("lastblock=" + result.blockNumber);
           document.cookie = "lastblock=" + result.blockNumber;
@@ -111,7 +112,9 @@ html
     
     function convertData(blockData)
     {
+      var current_time = moment().unix();
       var arrival_time = b2n(blockData.date_time) + b2n(blockData.est_time);
+      var est_sec = (arrival_time - current_time);
     
       var src_id = b2n(blockData.src_id);
       var dest_id = b2n(blockData.dest_id);
@@ -123,6 +126,8 @@ html
       var resultData = {
         'date_time': b2n(blockData.date_time),
         'est_time': b2n(blockData.est_time),
+        'est_sec': est_sec,
+        'arrival_time': arrival_time,
         'name': blockData.name,
         'sex': blockData.sex,
         'age': b2n(blockData.age),
@@ -133,7 +138,8 @@ html
         'dest_name': hostpitals[dest_id],
         'department_id': b2n(blockData.department_id),
         'symptom': blockData.symptom,
-        'severity': getSeverity(severity_id)
+        'severity': getSeverity(severity_id),
+        'severity_id': severity_id
       }
     
     
@@ -141,28 +147,23 @@ html
     
     
       var row = '';
-    
+
       row += '<tr>';
-      row += '<td>-</td>';
-      row += '<td>-</td>';
-      row += '<td>' + resultData.name + '</td>';
-      row += '<td>' + resultData.src_name + '</td>';
+      row += '<td class="text-center">' + moment(resultData.date_time, "X").format("H:mm:ss") + '</td>';
+      row += '<td class="text-center">' + resultData.est_sec + '</td>';
+      row += '<td class="text-center">' + resultData.name + '</td>';
+      row += '<td class="text-center">' + resultData.src_name + '</td>';
       row += '<td>' + resultData.symptom + '</td>';
       row += '<td class="text-center"><span class="label ' + resultData.severity.class + '">' + resultData.severity.text  + '</td>';
       row += '</tr>';
-    
-    
-      $("#lists > tbody").append(row);
+
+      if (resultData.date_time > 1000000)
+      {
+        $("#lists > tbody").append(row);
+      }
     
       
     }
-    
-    
-    function getHostpital(hostpital)
-    {
-    
-    } 
-    
     
     function getSeverity(severity)
     {
@@ -171,8 +172,8 @@ html
           return severitys[severity];
       } else {
           return {
-              'class': 'label-info',
-              'text': '-',
+            'class': 'label-info',
+            'text': '-'
           }
       }
     }

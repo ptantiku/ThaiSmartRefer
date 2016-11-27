@@ -1,0 +1,169 @@
+html
+  head
+    title Thai Smart Refer
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    meta(name="description" content="")
+    meta(name="author" content="")
+
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet")
+    link(href="css/timeTo.css" rel="stylesheet")
+    link(href="css/style.css" rel="stylesheet")
+  body
+    div(id="wrap")
+      div(class="container")
+        div(class="page-header text-center")
+          h1 ระบบส่งต่อผู้ป่วย
+          div
+            form(method="POST")
+              table(ALIGN="CENTER" width="80%" height="50%" cellpadding="10")
+                tr
+                  td &nbsp;
+                tr
+                  td เลขบัตรประชาชน
+                  td
+                    input(name="personal_id" id="personal_id" class="form-control" size="20" type="text")
+                tr
+                  td อายุ
+                  td
+                    input(name="age" id="age" class="form-control" size="2" type="text")
+                tr
+                  td เพศ
+                  td
+                    input(name="sex" type="radio" value="M")
+                    span &nbsp;ชาย&nbsp;
+                    input(name="sex" type="radio" value="F")
+                    span &nbsp;หญิง&nbsp;
+                    input(name="sex" type="radio" value="O")
+                    span &nbsp;ไม่ระบุ&nbsp;
+                tr
+                  td ชื่อ-นามสกุล &nbsp;
+                  td
+                    input(name="name" id="name" class="form-control" size="73" type="text")
+                tr
+                  td โรงพยาบาลต้นทาง
+                  td
+                    select(name="src_id" id="src_id" class="form-control")
+                      option(value="1") เลย
+                      option(value="2") ภูกระดึง 
+                tr
+                  td โรงพยาบาลปลายทาง
+                  td
+                    select(name="dest_id" id="dest_id" class="form-control")
+                      option(value="1") เลย
+                      option(value="2") ภูกระดึง
+                tr
+                  td อาการ
+                  td
+                    input(name="symptom" id="symptom" class="form-control" size="73" type="text")
+                tr
+                  td ความรุนแรง
+                  td
+                    input(name="severity" type="radio" value="5")
+                    span &nbsp; Resuscitation&nbsp; 
+                    input(name="severity" type="radio" value="4")
+                    span &nbsp; Emergency &nbsp; 
+                    input(name="severity" type="radio" value="3")
+                    span &nbsp; Urgency &nbsp; 
+                    input(name="severity" type="radio" value="2")
+                    span &nbsp; Semi-urgency &nbsp; 
+                    input(name="severity" type="radio" value="1")
+                    span &nbsp; Non-urgency &nbsp;
+                tr
+                  td เวลา
+                  td
+                    select(id="est_time" name="est_time" class="form-control")
+                      option(value="15") 15 นาที
+                      option(value="30") 30 นาที
+                      option(value="45") 45 นาที
+                      option(value="60") 1 ชั่วโมง
+                      option(value="120") 2 ชั่วโมง
+                      option(value="180") 3 ชั่วโมง
+
+          div(style="text-align: center;")
+            input(id="submit" name="submit" class="btn btn-small btn-primary" type="submit" class="button")
+
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js")
+    script(src="http://lexxus.github.io/jq-timeTo/js/jquery.timeTo.min.js")
+    script(type="text/javascript" src="js/web3.js")
+    
+    script(type="text/javascript").
+      // Web3
+      var Web3 = require("web3")
+      if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+      } else {
+        // set the provider you want from Web3.providers
+        web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
+      }
+    
+      mywallet_id = web3.eth.accounts[0];
+      contract_id = "0x1fE5154586e63BB1512C025c065dd495e0D6E5e6";
+      contract_interface = [ 
+        { 
+              "constant": false, 
+              "inputs": [ { "name": "date_time", "type": "uint256" }, { "name": "est_time", "type": "uint256" }, { "name": "name", "type": "string" }, { "name": "sex", "type": "string" }, { "name": "age", "type": "uint256" }, { "name": "personal_id", "type": "string" }, { "name": "src_id", "type": "uint256" }, { "name": "dest_id", "type": "uint256" }, { "name": "department_id", "type": "uint256" }, { "name": "symptom", "type": "string" }, { "name": "severity", "type": "uint256" } ], 
+              "name": "add", 
+              "outputs": [], 
+              "payable": false, "type": "function" 
+          }, { 
+              "anonymous": false, 
+              "inputs": [ { "indexed": false, "name": "date_time", "type": "uint256" }, { "indexed": false, "name": "est_time", "type": "uint256" }, { "indexed": false, "name": "name", "type": "string" }, { "indexed": false, "name": "sex", "type": "string" }, { "indexed": false, "name": "age", "type": "uint256" }, { "indexed": false, "name": "personal_id", "type": "string" }, { "indexed": false, "name": "src_id", "type": "uint256" }, { "indexed": false, "name": "dest_id", "type": "uint256" }, { "indexed": false, "name": "department_id", "type": "uint256" }, { "indexed": false, "name": "symptom", "type": "string" }, { "indexed": false, "name": "severity", "type": "uint256" } ], 
+              "name": "alert", "type": "event" 
+          } 
+      ];
+    
+    
+      //setup contract
+      var MyContract = web3.eth.contract(contract_interface);
+      var ContractInstance = MyContract.at(contract_id);
+    
+    
+      $('#submit').click(function(){
+    
+        var personal_id = $('#personal_id').val();
+        var age = $('#age').val();
+        var sex = $("input[name='sex']:checked").val();
+        var name = $('#name').val();
+    
+        var src_id = $('#src_id').val();
+        var dest_id = $('#dest_id').val();
+    
+        var symptom = $('#symptom').val();
+        var severity = $("input[name='severity']:checked").val();
+    
+        var est_time = $('#est_time').val() * 60;
+    
+        console.log('est_time = ' + est_time );
+    
+    
+        if (confirm('Confirm submit??')) {
+          console.log("call add function");
+          var now = Math.floor(Date.now()/1000);
+          var user = Math.floor((Math.random() * 100) + 1);
+          ContractInstance.add( now, est_time, name, sex, age, personal_id, src_id, dest_id, 1, symptom, severity, {from: mywallet_id}, function(error,result){
+              if(!error) 
+                  console.log("Tx=" + result);
+          });
+        } 
+    
+      });
+    
+    
+      /*
+      //call add function
+      console.log("call add function");
+      var now = Math.floor(Date.now()/1000);
+      var user = Math.floor((Math.random() * 100) + 1);
+      ContractInstance.add( now, 3600, "User "+user, "M", 25, "9876543210123", 1, 2, 1, "Headache", 1, {from: mywallet_id}, function(error,result){
+          if(!error) 
+              console.log("Tx=" + result);
+      });
+    
+      //setup watch
+      var event = ContractInstance.alert({dest_id: 2},{fromBlock:0, toBlock: 'latest', address: contract_id});
+      //watch for changes
+      event.watch(function(error, result){
+          if (!error) console.log(result);
+      });
+      */
