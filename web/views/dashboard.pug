@@ -10,6 +10,9 @@ html
     link(href="css/timeTo.css" rel="stylesheet")
     link(href="css/style.css" rel="stylesheet")
 
+    script(type="text/javascript").
+      var lastblock = #{lastblock};
+
   body
     div(id="wrap")
       div(class="container")
@@ -88,7 +91,7 @@ html
     
     
     //setup watch
-    var event = ContractInstance.alert({dest_id: 2},{fromBlock:0, toBlock: 'latest', address: contract_id});
+    var event = ContractInstance.alert({dest_id: 2},{fromBlock: lastblock, toBlock: 'latest', address: contract_id});
     // watch for changes
     event.watch(function(error, result){
         if (!error) {
@@ -100,6 +103,9 @@ html
     
           //var x = new BigNumber(args.age);
           console.log(b2n(args.age));
+
+          console.log("lastblock=" + result.blockNumber);
+          document.cookie = "lastblock=" + result.blockNumber;
         }
     });
     
