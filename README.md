@@ -3,5 +3,5 @@
 
 GETH command for running server
 ```
-geth --testnet --fast --ipcpath ~/.ethereum/geth.ipc --rpc --unlock <0x...wallet_id...> console
+geth --testnet --fast --ipcpath ~/.ethereum/geth.ipc --rpc --rpccorsdomain '*' --unlock <0x...wallet_id...> console
 ```
